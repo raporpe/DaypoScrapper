@@ -101,6 +101,7 @@ func main() {
 
 	infoLog.Println("SPAWNING DATABSE")
 	//Start database worker
+	go DatabaseWorker(dbChannel)
 	for i := 0; i < poolNumber/2; i++ {
 		go DatabaseWorker(dbChannel)
 	}
