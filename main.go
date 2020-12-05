@@ -15,8 +15,8 @@ import (
 )
 
 var infoLog = log.New(os.Stdout, "✅ ", log.Lmsgprefix)
-var warningLog = log.New(os.Stdout, "🚨 ", log.Lmsgprefix)
-var errorLog = log.New(os.Stdout, "❌ ", log.Lmsgprefix)
+var warningLog = log.New(os.Stdout, "🚨 ", log.Ldate | log.Lmsgprefix)
+var errorLog = log.New(os.Stdout, "❌ ", log.Ldate | log.Lmsgprefix)
 
 func main() {
 
@@ -93,7 +93,7 @@ func main() {
 
 	infoLog.Println("SPAWNING CRAWLERS -> " + strconv.Itoa(poolNumber))
 
-	dbChannel := make(chan []daypoTest, 1000)
+	dbChannel := make(chan []daypoTest, 100)
 	// Initialize pool of scrappers
 	for i := 0; i < poolNumber; i++ {
 		go dissectUrl(scrapperChannel, dbChannel)
@@ -101,7 +101,9 @@ func main() {
 
 	infoLog.Println("SPAWNING DATABSE")
 	//Start database worker
-	go DatabaseWorker(dbChannel)
+	for i := 0; i < poolNumber/2; i++ {
+		go DatabaseWorker(dbChannel)
+	}
 
 
 	// Sleep for ever
@@ -115,24 +117,26 @@ func dissectUrl(scrapperChannel chan string, dbChannel chan []daypoTest) {
 
 		url := <-scrapperChannel
 
-		if url == "\n" {
+		if url == "\n"  {
 			continue
 		}
 		// Indefinite refresh
 		if url == "main" {
 			for {
 				infoLog.Println("Infinite worker url --> " + url)
-				testsUrl := GetAllDaypoTestUrl("https://daypo.com/")
+				testsUrl := GetAllDaypoTestUrl("https://daypo.com/", scrapperChannel)
+
 				var scrapped []daypoTest
+
 				scrapped = ScrapDaypoTests(testsUrl)
 				infoLog.Println("Sending results to database")
 				dbChannel <- scrapped
-				time.Sleep(100 * time.Second)
+				time.Sleep(60 * time.Second)
 			}
 		}
 
 		infoLog.Println("Dissecting url --> " + url)
-		testsUrl := GetAllDaypoTestUrl(url)
+		testsUrl := GetAllDaypoTestUrl(url, scrapperChannel)
 		infoLog.Println("Got " + strconv.Itoa(len(testsUrl)) + " suburls in " + url)
 		infoLog.Println("Sending to scrapper")
 
@@ -196,6 +200,9 @@ func DatabaseWorker(dbChannel chan []daypoTest) {
 
 		batch := <- dbChannel
 
+		if batch == nil {
+			continue
+		}
 
 		for _, test := range batch {
 			_, err := db.Exec("INSERT INTO daypo.daypo VALUES (?, ?, ?, ?, ?, ?, ?, ?)", test.title,

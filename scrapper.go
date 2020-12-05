@@ -59,6 +59,10 @@ func GetGoquery(url string) (*goquery.Document, error) {
 func ScrapDaypoTests(urls []string) []daypoTest  {
 
 	var daypoTests []daypoTest
+	
+	if urls == nil {
+		return nil
+	}
 
 	for _, url := range urls {
 		isTest, err := IsTest(url)
@@ -114,12 +118,14 @@ func ScrapDaypoTests(urls []string) []daypoTest  {
 
 }
 
-func GetAllDaypoTestUrl(url string) []string {
+func GetAllDaypoTestUrl(url string, scrapperChannel chan string) []string {
 
 	var result []string
 	gq, err := GetGoquery(url)
 	if err != nil {
 		warningLog.Println("There was a goquery error extracting suburls in " + url + ": " + err.Error())
+		scrapperChannel <- url
+		return nil
 	}
 
 	gq.Find("a[href]").Each(func(index int, item *goquery.Selection) {
