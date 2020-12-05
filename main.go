@@ -15,8 +15,8 @@ import (
 )
 
 var infoLog = log.New(os.Stdout, "✅ ", log.Lmsgprefix)
-var warningLog = log.New(os.Stdout, "🚨 ", log.Ldate | log.Lmsgprefix)
-var errorLog = log.New(os.Stdout, "❌ ", log.Ldate | log.Lmsgprefix)
+var warningLog = log.New(os.Stdout, "🚨 ", log.Ltime | log.Lmsgprefix)
+var errorLog = log.New(os.Stdout, "❌ ", log.Ltime | log.Lmsgprefix)
 
 func main() {
 
