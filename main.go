@@ -131,7 +131,7 @@ func dissectUrl(scrapperChannel chan string, dbChannel chan []daypoTest) {
 				scrapped = ScrapDaypoTests(testsUrl)
 				infoLog.Println("Sending results to database")
 				dbChannel <- scrapped
-				time.Sleep(60 * time.Second)
+				time.Sleep(120 * time.Second)
 			}
 		}
 

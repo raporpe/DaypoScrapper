@@ -6,7 +6,6 @@
   <component name="ChangeListManager">
     <list default="true" id="461adf5c-fdc8-41d5-b152-2698a4982617" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/main.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/scrapper.go" beforeDir="false" afterPath="$PROJECT_DIR$/scrapper.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
